@@ -130,5 +130,5 @@ dmypy.json
 
 # Source Data
 *.csv
-*.txt
+unwanted_transaction.txt
 .vscode/
