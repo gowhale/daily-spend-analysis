@@ -42,13 +42,14 @@ for line in unwanted_transactions_lines:
     if stripped_line[:3] == "tx_":
         print(stripped_line)
         trimmed_df = trimmed_df[trimmed_df["Transaction ID"] != stripped_line]
-        
-trimmed_df.to_csv('transaction_log.csv')
+
+trimmed_df.to_csv('trimmed_dataset.csv')
 
 # Create a daily expenses dataframe
 
-expenses = trimmed_df[trimmed_df["Amount"]<0]
-income = trimmed_df[trimmed_df["Amount"]>0]
+expenses = trimmed_df[trimmed_df["Amount"] < 0]
+expenses["Amount"] = expenses["Amount"].abs()
+income = trimmed_df[trimmed_df["Amount"] > 0]
 
 list_of_date_range = pd.date_range(start=start_date_obj, end=end_date_obj)
 list_of_date_range = list_of_date_range.strftime(date_format)
@@ -60,23 +61,26 @@ for date in list_of_date_range:
     daily_dates.append(date)
     date_sum = expenses[expenses["Date"] == date]["Amount"].sum()
     daily_sums.append(date_sum)
-    print((date,date_sum))
+    print((date, date_sum))
 
 daily_expenses_df = pd.DataFrame(
     {'Date': daily_dates,
      'Amount': daily_sums,
-    })
+     })
+
+daily_expenses_df.to_csv("daily_expeneses.csv")
 
 # Create graph for daily spending
 
 print("\n\nCreating graph...")
-fig = px.scatter(daily_expenses_df, x="Date", y="Amount",color="Amount",color_continuous_scale=[ "red", "orange","green",],)
+fig = px.scatter(daily_expenses_df, x="Date", y="Amount", color="Amount",
+                 color_continuous_scale=["green", "orange", "red", ],)
 fig.update_traces(marker=dict(size=12))
-fig.update_yaxes(range=[0, -200])
+fig.update_yaxes(range=[0, 200])
 fig.update_layout(
-    title="Sleep Scores Over Time",
+    title="Daily Spends",
     xaxis_title="Date",
-    yaxis_title="Overall Sleep Score",
+    yaxis_title="Amount (GDP)",
     font=dict(
         family="Arial",
         size=25,
