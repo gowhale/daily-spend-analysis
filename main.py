@@ -28,9 +28,21 @@ for date in raw_df["Date"]:
 
 raw_df["Within Wanted Range"] = valid_dates
 
-spending_within_dates = raw_df[raw_df["Within Wanted Range"] == True]
+spending_within_dates_df = raw_df[raw_df["Within Wanted Range"] == True]
+
 
 # Remove unwanted transactions
+trimmed_df = spending_within_dates_df
+ignore_transation_file = open('unwanted_transactions.txt', 'r')
+unwanted_transactions_lines = ignore_transation_file.readlines()
+
+for line in unwanted_transactions_lines:
+    stripped_line = (line.strip())
+    if stripped_line[:3] == "tx_":
+        print(stripped_line)
+        trimmed_df = trimmed_df[trimmed_df["Transaction ID"] != stripped_line]
+        
+trimmed_df.to_csv('transaction_log.csv')
 
 # Create graph for daily spending
 
